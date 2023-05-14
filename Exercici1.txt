@@ -1,0 +1,12 @@
+#Individu
+LOAD CSV WITH HEADERS FROM
+" h t t p s : / / d o c s . g o o g l e . com/ s p r e a d s h e e t s /d/ e /
+2PACX−1vTfU6oJBZhmhzzkV_0−avABPzHTdXy8851ySDbn2gq32WwaNmYxfiBtCGJGOZ
+sMgCWjzlEGX4Zh1wqe/pub? output=c s v " a s row
+WITH row
+WHERE row . Id i s not NULL
+MERGE ( i : I n d i v i d u { I n d i v i d u I D : row . Id } )
+SET i . Year = t o I n t e g e r ( row . Year ) , i . Name = row . name ,
+i . Surname = row . surname , i . SecondSurname = row . second_surname
+CREATE CONSTRAINT U niq ueI ndiv idu ID FOR ( i : I n d i v i d u )
+REQUIRE i . I n d i v i d u I D IS UNIQUE;
