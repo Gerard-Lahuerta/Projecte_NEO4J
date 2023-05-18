@@ -1,0 +1,19 @@
+2.- Per a cada padró de Sant Feliu de Llobregat (SFLL), retorna l’any de padró, el número d'habitants, i la llista de cognoms. Elimina duplicats i “nan”.
+
+MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) WHERE h.Municipi='SFLL' AND i.Surname<>'nan' AND i.Surname<>'?' IS NOT NULL 
+RETURN DISTINCT h.YearPadro AS Any_Padro, count(i.IndividuID) AS N_habitants, collect(DISTINCT i.Surname) AS Cognoms
+
+9.- Llisteu totes les relacions familiars que hi ha. 
+
+MATCH (i:Individu)-[f:Relacio_Familiar]-(i2:Individu) 
+WHERE f.relacio<>'null' 
+RETURN DISTINCT f.relacio
+
+10.- Identifiqueu els nodes que representen el mateix habitatge (carrer i numero) al llarg dels padrons de Sant Feliu del Llobregat (SFLL). Seleccioneu només 
+els habitatges que tinguin totes dues informacions (carrer i numero). Per a cada habitatge, retorneu el carrer i número, el nombre total de padrons on apareix, 
+el llistat d’anys dels padrons i el llistat de les Ids de les llars (eviteu duplicats). Ordeneu de més a menys segons el total de padrons i mostreu-ne 
+els 15 primers.
+
+MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) 
+WHERE h.Municipi='SFLL' AND h.Carrer IS NOT NULL AND h.Num IS NOT NULL 
+RETURN h.Carrer AS Carrer, h.Num AS Numero, count(h.YearPadro) AS TotalPadrons, collect(DISTINCT h.YearPadro) AS AnysPadrons, collect(DISTINCT h.LlarID) AS Id_Llars ORDER BY TotalPadrons DESC LIMIT 15
