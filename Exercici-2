@@ -1,7 +1,26 @@
+1.- Del padró de 1866 de Castellví de Rosanes (CR), retorna el número d'habitants i la 
+llista de cognoms, sense eliminar duplicats.
+
+MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) WHERE h.Municipi='CR'
+RETURN count(i.IndividuID) AS N_habitants, collect(i.Surname) AS Cognoms
+
 2.- Per a cada padró de Sant Feliu de Llobregat (SFLL), retorna l’any de padró, el número d'habitants, i la llista de cognoms. Elimina duplicats i “nan”.
 
 MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) WHERE h.Municipi='SFLL' AND i.Surname<>'nan' AND i.Surname<>'?' IS NOT NULL 
 RETURN DISTINCT h.YearPadro AS Any_Padro, count(i.IndividuID) AS N_habitants, collect(DISTINCT i.Surname) AS Cognoms
+
+5.- Retorna totes les aparicions de "miguel estape bofill". Fes servir la relació SAME_AS
+per poder retornar totes les instancies, independentment de si hi ha variacions
+lèxiques (ex. diferents formes d'escriure el seu nom/cognoms). Mostra la informació
+en forma de subgraf.
+
+MATCH(i:Individu {Name:"miguel", Surname:"estape", SecondSurname:"bofill"})-[r:SAME_AS]->(l:Individu) return i,l
+
+6.- De la consulta anterior, retorna la informació en forma de taula: el nom, la llista de
+cognoms i la llista de segon cognom (elimina duplicats).
+
+MATCH(i:Individu {Name:"miguel", Surname:"estape", SecondSurname:"bofill"})-[r:SAME_AS]->(l:Individu) return l.Name, 
+collect(distinct l.Surname), collect(distinct l.SecondSurname)
 
 9.- Llisteu totes les relacions familiars que hi ha. 
 
