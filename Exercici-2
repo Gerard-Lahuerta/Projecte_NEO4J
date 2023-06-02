@@ -9,6 +9,16 @@ RETURN count(i.IndividuID) AS N_habitants, collect(i.Surname) AS Cognoms
 MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) WHERE h.Municipi='SFLL' AND i.Surname<>'nan' AND i.Surname<>'?' IS NOT NULL 
 RETURN DISTINCT h.YearPadro AS Any_Padro, count(i.IndividuID) AS N_habitants, collect(DISTINCT i.Surname) AS Cognoms
 
+3. Dels padrons de Sant Feliu de Llobregat (SFLL) d’entre 1800 i 1845 (no inclosos),
+retorna la població, l'any del padró i la llista d'identificadors dels habitatges de cada
+padró. Ordena els resultats per l'any de padró.
+
+match (h:Habitatge {Municipi: "SFLL"})
+where h.AnyPadro < 1845 and h.AnyPadro > 1800
+return h.Municipi as `Població`, 
+       h.AnyPadro as `Any Padro`, 
+       collect(h.LlarID) as `Identificador LLar`
+
 4. Retorna el nom de les persones que vivien al mateix habitatge que "rafel marti" (no
 té segon cognom) segons el padró de 1838 de Sant Feliu de Llobregat (SFLL).
 Retorna la informació en mode graf i mode llista.
@@ -31,6 +41,26 @@ cognoms i la llista de segon cognom (elimina duplicats).
 
 MATCH(i:Individu {Name:"miguel", Surname:"estape", SecondSurname:"bofill"})-[r:SAME_AS]->(l:Individu) return l.Name, 
 collect(distinct l.Surname), collect(distinct l.SecondSurname)
+
+7. Mostra totes les persones relacionades amb "benito julivert". Mostra la informació
+en forma de taula: el nom, cognom1, cognom2, i tipus de relació.
+
+match (p:Individu {Name:"benito", Surname: "julivert"}) 
+       -[rel]- (r:Individu)
+where p.IndividuID <> r.IndividuID
+return r.Name+" "+r.Surname+" "+r.SecondSurname as `Individu`, 
+       type(rel) as `relació`
+
+8. De la consulta anterior, mostra ara només els fills o filles de "benito julivert". Ordena
+els resultats alfabèticament per nom.
+
+match (p:Individu {Name:"benito", Surname: "julivert"}) 
+      -[rel]- (r:Individu)
+where rel.relacio_harmonitzada = "fill" or 
+      rel.relacio_harmonitzada = "filla"
+return r.Name+" "+r.Surname+" "+r.SecondSurname as `Individu`, 
+       type(rel) as `relació`
+order by r.Name
 
 9.- Llisteu totes les relacions familiars que hi ha. 
 
