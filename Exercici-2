@@ -9,6 +9,17 @@ RETURN count(i.IndividuID) AS N_habitants, collect(i.Surname) AS Cognoms
 MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) WHERE h.Municipi='SFLL' AND i.Surname<>'nan' AND i.Surname<>'?' IS NOT NULL 
 RETURN DISTINCT h.YearPadro AS Any_Padro, count(i.IndividuID) AS N_habitants, collect(DISTINCT i.Surname) AS Cognoms
 
+4. Retorna el nom de les persones que vivien al mateix habitatge que "rafel marti" (no
+té segon cognom) segons el padró de 1838 de Sant Feliu de Llobregat (SFLL).
+Retorna la informació en mode graf i mode llista.
+
+Mode llista:
+MATCH (r:Individu{Name:"rafael", Surname:"marti"}) -[:VIU_A]->(h:Habitatge{YearPadro:1838})<-[:VIU_A]-(p:Individu)
+WHERE r.SecondSurname is null
+return collect(p.Name + " " + p.Surname + " " + p.SecondSurname) AS Noms
+
+
+
 5.- Retorna totes les aparicions de "miguel estape bofill". Fes servir la relació SAME_AS
 per poder retornar totes les instancies, independentment de si hi ha variacions
 lèxiques (ex. diferents formes d'escriure el seu nom/cognoms). Mostra la informació
