@@ -86,12 +86,13 @@ MATCH (h:Habitatge{Municipi:"CR"})-[:VIU_A]-(cap:Individu)<-[rel:Relacio_Familia
 WHERE rel.relacio = "hijo" or rel.relacio = "hija" and cap.IndividuID <> fill.IndividuID
 WITH  collect(distinct fill.IndividuID) as Fills, cap.IndividuID as Pare, collect(fill.Name) as NomsFills, cap.Name as NomPare
 WHERE size(Fills) >= 3
-RETURN NomsFills, NomPare, size(NomsFills)
+RETURN NomsFills, NomPare, size(NomsFills) ORDER BY size(NomsFills) DESC LIMIT 20
 
 
 12. Mitja de fills a Sant Feliu del Llobregat l’any 1881 per família. Mostreu el total de
 fills, el nombre d’habitatges i la mitja de fills per habitatge. Fes servir CALL per
-obtenir el nombre de llars
+obtenir el nombre de llars.
+
 CALL { 
     MATCH(h:Habitatge{Municipi:"SFLL", AnyPadro:1881})
     RETURN count(h.LlarID) as NombreLlars
