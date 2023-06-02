@@ -14,8 +14,7 @@ té segon cognom) segons el padró de 1838 de Sant Feliu de Llobregat (SFLL).
 Retorna la informació en mode graf i mode llista.
 
 Mode llista:
-MATCH (r:Individu{Name:"rafael", Surname:"marti"}) -[:VIU_A]->(h:Habitatge{YearPadro:1838})<-[:VIU_A]-(p:Individu)
-WHERE r.SecondSurname is null
+MATCH (r:Individu{Name:"rafel", Surname:"marti"}) -[:VIU_A]->(h:Habitatge{AnyPadro:1838})<-[:VIU_A]-(p:Individu)
 return collect(p.Name + " " + p.Surname + " " + p.SecondSurname) AS Noms
 
 
