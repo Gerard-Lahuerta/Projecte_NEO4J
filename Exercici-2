@@ -89,6 +89,22 @@ WHERE size(Fills) >= 3
 RETURN NomsFills, NomPare, size(NomsFills)
 
 
+12. Mitja de fills a Sant Feliu del Llobregat l’any 1881 per família. Mostreu el total de
+fills, el nombre d’habitatges i la mitja de fills per habitatge. Fes servir CALL per
+obtenir el nombre de llars
+CALL { 
+    MATCH(h:Habitatge{Municipi:"SFLL", AnyPadro:1881})
+    RETURN count(h.LlarID) as NombreLlars
+}
+
+MATCH (h:Habitatge{Municipi:"SFLL", AnyPadro:1881})-[:VIU_A]-(cap:Individu)<-[rel:Relacio_Familiar]-(fill:Individu)
+WHERE rel.relacio_harmonitzada = "fill" or rel.relacio_harmonitzada = "filla" and cap.IndividuID <> fill.IndividuID
+WITH  distinct fill.IndividuID as Fills, NombreLlars
+
+RETURN count(Fills), NombreLlars, count(Fills)/NombreLlars as Mitja
+
+
+
 13.- Per cada padró/any de Sant Feliu de Llobregat, mostra el carrer amb menys habitants
 i el nombre d’habitants en aquell carrer. Fes servir la funció min() i CALL per obtenir
 el nombre mínim d’habitants. Ordena els resultats per any de forma ascendent.
