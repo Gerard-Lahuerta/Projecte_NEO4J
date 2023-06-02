@@ -46,3 +46,17 @@ els 15 primers.
 MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) 
 WHERE h.Municipi='SFLL' AND h.Carrer IS NOT NULL AND h.Num IS NOT NULL 
 RETURN h.Carrer AS Carrer, h.Num AS Numero, count(h.YearPadro) AS TotalPadrons, collect(DISTINCT h.YearPadro) AS AnysPadrons, collect(DISTINCT h.LlarID) AS Id_Llars ORDER BY TotalPadrons DESC LIMIT 15
+
+13.- Per cada padró/any de Sant Feliu de Llobregat, mostra el carrer amb menys habitants
+i el nombre d’habitants en aquell carrer. Fes servir la funció min() i CALL per obtenir
+el nombre mínim d’habitants. Ordena els resultats per any de forma ascendent.
+
+CALL {
+MATCH(i:Individu)-[v:VIU_A]->(h:Habitatge) 
+WHERE h.Municipi='SFLL' 
+RETURN count(i) as habitants, h.Carrer as carrer, h.AnyPadro as any
+}
+WITH habitants, carrer, any 
+ORDER BY habitants ASC 
+RETURN collect(carrer)[0] as carrer, min(habitants) as Num_Habitants, any 
+ORDER BY any
