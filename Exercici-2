@@ -62,6 +62,7 @@ return r.Name+" "+r.Surname+" "+r.SecondSurname as `Individu`,
        type(rel) as `relació`
 order by r.Name
 
+
 9.- Llisteu totes les relacions familiars que hi ha. 
 
 MATCH (i:Individu)-[f:Relacio_Familiar]-(i2:Individu) 
@@ -76,6 +77,17 @@ els 15 primers.
 MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) 
 WHERE h.Municipi='SFLL' AND h.Carrer IS NOT NULL AND h.Num IS NOT NULL 
 RETURN h.Carrer AS Carrer, h.Num AS Numero, count(h.YearPadro) AS TotalPadrons, collect(DISTINCT h.YearPadro) AS AnysPadrons, collect(DISTINCT h.LlarID) AS Id_Llars ORDER BY TotalPadrons DESC LIMIT 15
+
+11. Mostreu les famílies de Castellví de Rosanes amb més de 3 fills. Mostreu el nom i
+cognoms del cap de família i el nombre de fills. Ordeneu-les pel nombre de fills fins
+a un límit de 20, de més a menys.
+
+MATCH (h:Habitatge{Municipi:"CR"})-[:VIU_A]-(cap:Individu)<-[rel:Relacio_Familiar]-(fill:Individu)
+WHERE rel.relacio = "hijo" or rel.relacio = "hija" and cap.IndividuID <> fill.IndividuID
+WITH  collect(distinct fill.IndividuID) as Fills, cap.IndividuID as Pare, collect(fill.Name) as NomsFills, cap.Name as NomPare
+WHERE size(Fills) >= 3
+RETURN NomsFills, NomPare, size(NomsFills)
+
 
 13.- Per cada padró/any de Sant Feliu de Llobregat, mostra el carrer amb menys habitants
 i el nombre d’habitants en aquell carrer. Fes servir la funció min() i CALL per obtenir
