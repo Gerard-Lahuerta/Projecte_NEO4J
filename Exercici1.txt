@@ -23,4 +23,9 @@ SET h.Carrer = Carrer,  h.Num = Numero
 CREATE CONSTRAINT FOR (h:Habitatge) REQUIRE (h.LlarID, h.Municipi, h.AnyPadro) IS NODE KEY
 
 
-
+# Relació viu
+LOAD CSV WITH HEADERS FROM 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRM4DPeqFmv7w6kLH5msNk6_Hdh1wuExRirgysZKO_Q70L21MKBkDISIyjvdm8shVixl5Tcw_5zCfdg/pub?output=csv' AS vivencia 
+WITH vivencia
+MATCH (p:Individu {IndividuID:vivencia.IND})
+MATCH (h:Habitatge{LlarID:toInteger(vivencia.HOUSE_ID),Municipi:vivencia.Location,YearPadro:toInteger(vivencia.Year)})
+merge (p) -[rel:VIU_A]- (h)
