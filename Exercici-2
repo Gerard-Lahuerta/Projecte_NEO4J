@@ -1,0 +1,121 @@
+1.- Del padró de 1866 de Castellví de Rosanes (CR), retorna el número d'habitants i la 
+llista de cognoms, sense eliminar duplicats.
+
+MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) WHERE h.Municipi='CR'
+RETURN count(i.IndividuID) AS N_habitants, collect(i.Surname) AS Cognoms
+
+2.- Per a cada padró de Sant Feliu de Llobregat (SFLL), retorna l’any de padró, el número d'habitants, i la llista de cognoms. Elimina duplicats i “nan”.
+
+MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) WHERE h.Municipi='SFLL' AND i.Surname<>'nan' AND i.Surname<>'?' IS NOT NULL 
+RETURN DISTINCT h.YearPadro AS Any_Padro, count(i.IndividuID) AS N_habitants, collect(DISTINCT i.Surname) AS Cognoms
+
+3. Dels padrons de Sant Feliu de Llobregat (SFLL) d’entre 1800 i 1845 (no inclosos),
+retorna la població, l'any del padró i la llista d'identificadors dels habitatges de cada
+padró. Ordena els resultats per l'any de padró.
+
+match (h:Habitatge {Municipi: "SFLL"})
+where h.AnyPadro < 1845 and h.AnyPadro > 1800
+return h.Municipi as `Població`, 
+       h.AnyPadro as `Any Padro`, 
+       collect(h.LlarID) as `Identificador LLar`
+
+4. Retorna el nom de les persones que vivien al mateix habitatge que "rafel marti" (no
+té segon cognom) segons el padró de 1838 de Sant Feliu de Llobregat (SFLL).
+Retorna la informació en mode graf i mode llista.
+
+Mode llista:
+MATCH (r:Individu{Name:"rafel", Surname:"marti"}) -[:VIU_A]->(h:Habitatge{AnyPadro:1838, Municipi: "SFLL"})<-[:VIU_A]-(p:Individu)
+return collect(p.Name + " " + p.Surname + " " + p.SecondSurname) AS Noms
+
+
+
+5.- Retorna totes les aparicions de "miguel estape bofill". Fes servir la relació SAME_AS
+per poder retornar totes les instancies, independentment de si hi ha variacions
+lèxiques (ex. diferents formes d'escriure el seu nom/cognoms). Mostra la informació
+en forma de subgraf.
+
+MATCH(i:Individu {Name:"miguel", Surname:"estape", SecondSurname:"bofill"})-[r:SAME_AS]->(l:Individu) return i,l
+
+6.- De la consulta anterior, retorna la informació en forma de taula: el nom, la llista de
+cognoms i la llista de segon cognom (elimina duplicats).
+
+MATCH(i:Individu {Name:"miguel", Surname:"estape", SecondSurname:"bofill"})-[r:SAME_AS]->(l:Individu) return l.Name, 
+collect(distinct l.Surname), collect(distinct l.SecondSurname)
+
+7. Mostra totes les persones relacionades amb "benito julivert". Mostra la informació
+en forma de taula: el nom, cognom1, cognom2, i tipus de relació.
+
+match (p:Individu {Name:"benito", Surname: "julivert"}) 
+       -[rel]- (r:Individu)
+where p.IndividuID <> r.IndividuID
+return r.Name+" "+r.Surname+" "+r.SecondSurname as `Individu`, 
+       type(rel) as `relació`
+
+8. De la consulta anterior, mostra ara només els fills o filles de "benito julivert". Ordena
+els resultats alfabèticament per nom.
+
+match (p:Individu {Name:"benito", Surname: "julivert"}) 
+      -[rel]- (r:Individu)
+where rel.relacio_harmonitzada = "fill" or 
+      rel.relacio_harmonitzada = "filla"
+return r.Name+" "+r.Surname+" "+r.SecondSurname as `Individu`, 
+       type(rel) as `relació`
+order by r.Name
+
+
+9.- Llisteu totes les relacions familiars que hi ha. 
+
+MATCH (i:Individu)-[f:Relacio_Familiar]-(i2:Individu) 
+WHERE f.relacio<>'null' 
+RETURN DISTINCT f.relacio
+
+10.- Identifiqueu els nodes que representen el mateix habitatge (carrer i numero) al llarg dels padrons de Sant Feliu del Llobregat (SFLL). Seleccioneu només 
+els habitatges que tinguin totes dues informacions (carrer i numero). Per a cada habitatge, retorneu el carrer i número, el nombre total de padrons on apareix, 
+el llistat d’anys dels padrons i el llistat de les Ids de les llars (eviteu duplicats). Ordeneu de més a menys segons el total de padrons i mostreu-ne 
+els 15 primers.
+
+MATCH (h:Habitatge)<-[v:VIU_A]-(i:Individu) 
+WHERE h.Municipi='SFLL' AND h.Carrer IS NOT NULL AND h.Num IS NOT NULL 
+RETURN h.Carrer AS Carrer, h.Num AS Numero, count(h.YearPadro) AS TotalPadrons, collect(DISTINCT h.YearPadro) AS AnysPadrons, collect(DISTINCT h.LlarID) AS Id_Llars ORDER BY TotalPadrons DESC LIMIT 15
+
+11. Mostreu les famílies de Castellví de Rosanes amb més de 3 fills. Mostreu el nom i
+cognoms del cap de família i el nombre de fills. Ordeneu-les pel nombre de fills fins
+a un límit de 20, de més a menys.
+
+MATCH (h:Habitatge{Municipi:"CR"})-[:VIU_A]-(cap:Individu)<-[rel:Relacio_Familiar]-(fill:Individu)
+WHERE rel.relacio = "hijo" or rel.relacio = "hija" and cap.IndividuID <> fill.IndividuID
+WITH  collect(distinct fill.IndividuID) as Fills, cap.IndividuID as Pare, collect(fill.Name) as NomsFills, cap.Name as NomPare
+WHERE size(Fills) >= 3
+RETURN NomsFills, NomPare, size(NomsFills) ORDER BY size(NomsFills) DESC LIMIT 20
+
+
+12. Mitja de fills a Sant Feliu del Llobregat l’any 1881 per família. Mostreu el total de
+fills, el nombre d’habitatges i la mitja de fills per habitatge. Fes servir CALL per
+obtenir el nombre de llars.
+
+CALL { 
+    MATCH(h:Habitatge{Municipi:"SFLL", AnyPadro:1881})
+    RETURN count(h.LlarID) as NombreLlars
+}
+
+MATCH (h:Habitatge{Municipi:"SFLL", AnyPadro:1881})-[:VIU_A]-(cap:Individu)<-[rel:Relacio_Familiar]-(fill:Individu)
+WHERE rel.relacio_harmonitzada = "fill" or rel.relacio_harmonitzada = "filla" and cap.IndividuID <> fill.IndividuID
+WITH  distinct fill.IndividuID as Fills, NombreLlars
+
+RETURN count(Fills), NombreLlars, count(Fills)/NombreLlars as Mitja
+
+
+
+13.- Per cada padró/any de Sant Feliu de Llobregat, mostra el carrer amb menys habitants
+i el nombre d’habitants en aquell carrer. Fes servir la funció min() i CALL per obtenir
+el nombre mínim d’habitants. Ordena els resultats per any de forma ascendent.
+
+CALL {
+MATCH(i:Individu)-[v:VIU_A]->(h:Habitatge) 
+WHERE h.Municipi='SFLL' 
+RETURN count(i) as habitants, h.Carrer as carrer, h.AnyPadro as any
+}
+WITH habitants, carrer, any 
+ORDER BY habitants ASC 
+RETURN collect(carrer)[0] as carrer, min(habitants) as Num_Habitants, any 
+ORDER BY any
