@@ -13,3 +13,22 @@ AS mida , collect ( nodeId ) AS nodes ORDER BY mida DESC RETURN componentId , mi
 CALL gds . wcc . stream ( ’ ex3a ’ ) YIELD componentId , nodeId WITH componentId , size ( collect ( nodeId ) ) AS mida ,
 collect ( nodeId ) AS nodes ORDER BY mida DESC MATCH(m: Individu ) −[ rel :VIU_A]−> ( n : Habitatge )
 WHERE i d ( n ) IN nodes return n.Municipi as municipi , n.AnyPadro as Any, count ( rel ) as num_relacions
+
+- Distribució de tipus de nodes (Individu o Habitatge) segons la mida de la cc.
+CALL gds.wcc.stream('ex3a')
+YIELD componentId, nodeId
+WITH componentId, size(collect(nodeId)) AS mida, collect(nodeId) AS nodes ORDER BY mida DESC 
+MATCH(n:Individu) WHERE id(n) IN nodes
+RETURN componentId, mida, round(count(n)* 1.0/mida,2) as num_ind, round((mida-count(n))* 1.0/mida,2) as num_hab
+
+- Quantes components connexes no estan connectades a cap node de tipus ‘Habitatge’.
+CALL gds.wcc.stream('ex3a')
+    YIELD componentId, nodeId
+    WITH componentId as totalCC, 
+         componentId, 
+         size(collect(nodeId)) AS mida, 
+         collect(nodeId) AS nodes
+    MATCH(h:Habitatge) 
+    WHERE id(h) in nodes
+    WITH componentId, nodes, totalCC
+    return count(totalCC)-count(distinct componentId) as CCNotConnected
