@@ -2,6 +2,11 @@ A continuació us mostrarem com hem importat les dades en la BD de Neo4j del pro
 que carrega totes les dades, genera tots els nodes, relacions i afegeix les característiques on pertoca.
 
 # NODES INDIVIDU
+LOAD CSV WITH HEADERS FROM 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTfU6oJBZhmhzzkV_0-avABPzHTdXy8851ySDbn2gq32WwaNmYxfiBtCGJGOZsMgCWjzlEGX4Zh1wqe/pub?output=csv' as row
+WITH row
+WHERE row.Id is not NULL
+MERGE (i:Individu {IndividuID: row.Id})
+SET i.Year = toInteger(row.Year), i.Name = row.name, i.Surname = row.surname, i.SecondSurname = row.second_surname
 
 # NODES HABITATGE
 
