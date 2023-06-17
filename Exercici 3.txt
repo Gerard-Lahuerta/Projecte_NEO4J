@@ -1,1 +1,15 @@
 Codi utilitzat per a fer l'analisi de grafs del exercici 3. Les conclusions i analisis extrets d'ells es troben a la memória de treball
+
+Exercici 3.1
+
+- Creació del graf:
+CALL gds.graph.project('ex3a',['Individu','Habitatge'], ['VIU_A','SAME_AS','Relacio_Familiar'])
+
+- Taula agrupant els resultats segons la mida de la cc.
+CALL gds . wcc . stream ( ’ ex3a ’ ) YIELD componentId , nodeId WITH componentId , size ( collect ( nodeId ) )
+AS mida , collect ( nodeId ) AS nodes ORDER BY mida DESC RETURN componentId , mida
+
+- Per cada municipi i any el nombre de parelles del tipus: (Individu)—(Habitatge).
+CALL gds . wcc . stream ( ’ ex3a ’ ) YIELD componentId , nodeId WITH componentId , size ( collect ( nodeId ) ) AS mida ,
+collect ( nodeId ) AS nodes ORDER BY mida DESC MATCH(m: Individu ) −[ rel :VIU_A]−> ( n : Habitatge )
+WHERE i d ( n ) IN nodes return n.Municipi as municipi , n.AnyPadro as Any, count ( rel ) as num_relacions
