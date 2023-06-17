@@ -1,6 +1,6 @@
 Codi utilitzat per a fer l'analisi de grafs del exercici 3. Les conclusions i analisis extrets d'ells es troben a la memória de treball
 
-Exercici 3.1
+Exercici 3.a
 
 - Creació del graf:
 CALL gds.graph.project('ex3a',['Individu','Habitatge'], ['VIU_A','SAME_AS','Relacio_Familiar'])
@@ -34,7 +34,7 @@ CALL gds.wcc.stream('ex3a')
     return count(totalCC)-count(distinct componentId) as CCNotConnected
 
 
-Exercici 3.2
+Exercici 3.b
 
 - Determineu els habitatges que són els mateixos al llarg dels anys. Afegiu una aresta amb nom “MATEIX_HAB“ entre aquests habitatges.
 Per evitar arestes duplicades feu que la aresta apunti al habitatge amb any de padró més petit.
@@ -50,4 +50,16 @@ MERGE ( h1 ) < −[:MATEIX_HAB] −( h2 )
 CALL gds.graph.project ( 'ex3b' , [ 'Individu' , 'Habitatge' ] ,
 [ 'VIU_A , 'MATEIX_HAB' , 'Relacio_Familiar' ] )
 
+- Calculeu la similaritat entre els nodes del graf que acabeu de crear, escriviu el
+resultat de nou a la base de dades i interpreteu els resultats obtinguts.
+    
+CALL gds.nodeSimilarity.write('ex3b',{
+writeRelationshipType:'SIMILAR',
+writeProperty:'score',
+similarityCutoff:1.0,
+degreeCutoff: 2})
+YIELD nodesCompared, relationshipsWritten
+
+match (i:Individu)-[r:SIMILAR]->(p:Individu)
+return r.score, i.IndividuID, p.IndividuID
 
