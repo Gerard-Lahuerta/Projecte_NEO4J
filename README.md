@@ -1,5 +1,5 @@
 # Projecte_NEO4J
-Segon projecte de l'assignatura de BDnR
+Segon projecte de l'assignatura de BDnR.
 
 ## Participants
 1. Manuel Arnau Fernández, NIU: 1597487
@@ -31,6 +31,7 @@ L'última part del treball consisteix a analitzar les dades del graf per entendr
 Els materials produïts en aquest projecte, i que es poden observar en aquest github, són:
 
 DOCUMENTS:
-- .txt: Document de text on estan totes les queries de l'exercici 2.
-- .txt: Script de cypher que permet l'extracció de les dades i la generació de la base de dades.
+- Exercici-1: Script de cypher que permet l'extracció de les dades i la generació de la base de dades.
+- Exercici-2: Document de text on estan totes les queries de l'exercici 2.
+- Exercici-3: Estudi de les dades i interpretació de les relacions al graph.
 - Projecte_Neo4J.pdf: Informe que conté tot el treball fet.
