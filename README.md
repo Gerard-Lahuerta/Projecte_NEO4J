@@ -30,7 +30,7 @@ L'última part del treball consisteix a analitzar les dades del graf per entendr
 
 Els materials produïts en aquest projecte, i que es poden observar en aquest github, són:
 
-CAMBIAR PARA EL FINAL :
+DOCUMENTS:
 - .txt: Document de text on estan totes les queries de l'exercici 2.
 - .txt: Script de cypher que permet l'extracció de les dades i la generació de la base de dades.
 - Projecte_Neo4J.pdf: Informe que conté tot el treball fet.
