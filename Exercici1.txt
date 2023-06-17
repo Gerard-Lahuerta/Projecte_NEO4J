@@ -9,15 +9,18 @@ CREATE CONSTRAINT UniqueIndividuID FOR (i:Individu) REQUIRE i.IndividuID IS UNIQ
 
 
 #Habitatge
-LOAD CSV WITH HEADERS FROM "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0ZhR6BSO_M72JEmxXKs6GLuOwxm_Oy-0UruLJeX8_R04KAcICuvrwn2OENQhtuvddU5RSJSclHRJf/pub?output=csv" AS row
-WITH row.Municipi AS Municipi, toInteger(row.Id_Llar) AS LlarID, toInteger(row.Any_Padro) AS YearPadro, row.Carrer AS Carrer, toInteger(row.Numero) AS Num 
-FOREACH ( ignoreMe in CASE WHEN LlarID is not null THEN [1] ELSE [] END | 
-FOREACH (ignoreMe in CASE WHEN Municipi is not null THEN [1] ELSE [] END |
-MERGE (h:Habitatge {LlarID:LlarID}) SET h.Municipi = Municipi, h.YearPadro = YearPadro, h.Carrer = Carrer, h.Num = Num))
+LOAD CSV WITH HEADERS 
+FROM "https://docs.google.com/spreadsheets/d/e/2PACX1vT0ZhR6BSO_M72JEmxXKs6GLuOwxm_Oy0UruLJeX8_R04KAcICuvrwn2OENQhtuvddU5RSJSclHRJf/puboutput=csv" as row 
+with toInteger(row.Id_Llar) as LlarID, row.Municipi as 
+Municipi, toInteger(row.Any_Padro) as AnyPadro, row.Carrer as Carrer, toInteger(row.Numero) as Numero
 
-CREATE INDEX HabitatgeID FOR (h:Habitatge) ON (h.LlarID, h.Municipi, h.YearPadro)
+WHERE LlarID is not NULL and Municipi<>'null'
 
-CREATE CONSTRAINT UniqueHabitatgeID FOR (h:Habitatge) REQUIRE h.HabitatgeID IS UNIQUE
+CREATE  (h:Habitatge {LlarID: LlarID, Municipi: Municipi, AnyPadro: AnyPadro})
+
+SET h.Carrer = Carrer,  h.Num = Numero
+
+CREATE CONSTRAINT FOR (h:Habitatge) REQUIRE (h.LlarID, h.Municipi, h.AnyPadro) IS NODE KEY
 
 
 
