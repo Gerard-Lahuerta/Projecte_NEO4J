@@ -1,0 +1,1 @@
+Codi utilitzat per a fer l'analisi de grafs del exercici 3. Les conclusions i analisis extrets d'ells es troben a la memória de treball
