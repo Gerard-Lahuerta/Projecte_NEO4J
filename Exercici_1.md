@@ -9,6 +9,15 @@ MERGE (i:Individu {IndividuID: row.Id})
 SET i.Year = toInteger(row.Year), i.Name = row.name, i.Surname = row.surname, i.SecondSurname = row.second_surname
 
 # NODES HABITATGE
+LOAD CSV WITH HEADERS FROM "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0ZhR6BSO_M72JEmxXKs6GLuOwxm_Oy-0UruLJeX8_R04KAcICuvrwn2OENQhtuvddU5RSJSclHRJf/pub?output=csv" AS row
+WITH row.Municipi AS Municipi, toInteger(row.Id_Llar) AS LlarID, toInteger(row.Any_Padro) AS YearPadro, row.Carrer AS Carrer, toInteger(row.Numero) AS Num 
+FOREACH ( ignoreMe in CASE WHEN LlarID is not null THEN [1] ELSE [] END | 
+FOREACH (ignoreMe in CASE WHEN Municipi is not null THEN [1] ELSE [] END |
+MERGE (h:Habitatge {LlarID:LlarID}) SET h.Municipi = Municipi, h.YearPadro = YearPadro, h.Carrer = Carrer, h.Num = Num))
+
+CREATE INDEX HabitatgeID FOR (h:Habitatge) ON (h.LlarID, h.Municipi, h.YearPadro)
+
+CREATE CONSTRAINT UniqueHabitatgeID FOR (h:Habitatge) REQUIRE h.HabitatgeID IS UNIQUE
 
 # RELACIONS VIU
 
