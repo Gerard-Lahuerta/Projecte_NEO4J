@@ -32,3 +32,22 @@ CALL gds.wcc.stream('ex3a')
     WHERE id(h) in nodes
     WITH componentId, nodes, totalCC
     return count(totalCC)-count(distinct componentId) as CCNotConnected
+
+
+Exercici 3.2
+
+- Determineu els habitatges que són els mateixos al llarg dels anys. Afegiu una aresta amb nom “MATEIX_HAB“ entre aquests habitatges.
+Per evitar arestes duplicades feu que la aresta apunti al habitatge amb any de padró més petit.
+
+MATCH ( h1 : Habitatge ) , ( h2 : Habitatge )
+WHERE h1 <> h2 AND h1.LlarID = h2.LlarID
+AND h1.Municipi  = h2.Municipi
+AND h1.AnyPadro < h2.AnyPadro
+MERGE ( h1 ) < −[:MATEIX_HAB] −( h2 )
+
+- Creeu un graf en memòria que inclogui els nodes Individu i Habitatge i les relacions VIU, FAMILIA, MATEIX_HAB que acabeu de crear.
+
+CALL gds.graph.project ( 'ex3b' , [ 'Individu' , 'Habitatge' ] ,
+[ 'VIU_A , 'MATEIX_HAB' , 'Relacio_Familiar' ] )
+
+
