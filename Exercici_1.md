@@ -30,6 +30,14 @@ return count(rel)
 
 # RELACIONS SAME_AS
 
+LOAD CSV WITH HEADERS FROM 
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTgC8TBmdXhjUOPKJxyiZSpetPYjaRC34gmxHj6H2AWvXTGbg7MLKVdJnwuh5bIeer7WLUi0OigI6wc/pub?output=csv" AS row 
+WITH row.Id_A AS Id_A, row.Id_B AS Id_B
+MATCH (p:Individu {IndividuID:Id_A}) 
+MATCH (o:Individu {IndividuID:Id_B})
+MERGE (o)-[rel: SAME_AS]-(p)
+RETURN count(rel)
+
 # RELACIONS FAMILIA
 
 LOAD CSV WITH HEADERS FROM 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRVOoMAMoxHiGboTjCIHo2yT30CCWgVHgocGnVJxiCTgyurtmqCfAFahHajobVzwXFLwhqajz1fqA8d/pub?output=csv' AS row
